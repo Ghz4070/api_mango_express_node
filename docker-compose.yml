@@ -1,0 +1,43 @@
+version: "3.7"
+services:
+  redis:
+    image: redis:5.0.9
+    container_name: "redis"
+    hostname: redis
+    restart: always
+    volumes:
+      - ./database/data/redis:/data
+    ports:
+      - "6380:6379"
+    expose:
+      - 6380
+
+  mongodb:
+    image: mongo:4.2.8
+    container_name: "mongodb"
+    hostname: mongodb
+    restart: always
+    environment:
+      - MONGO_INITDB_DATABASE=dockerdb
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=secret
+    volumes:
+      - ./database/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ./database/data/db:/data/db
+    ports:
+      - "27019:27017"
+
+  node:
+    image: node:13.8
+    container_name: "node"
+    restart: always
+    working_dir: /app
+    volumes:
+      - ./:/app:cached
+    environment:
+      - NODE_ENV=production
+    command: sh -c "yarn && yarn devwatch"
+    ports:
+      - "5000:3000"
+    expose:
+      - "5000"

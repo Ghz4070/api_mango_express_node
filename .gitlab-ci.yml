@@ -1,0 +1,11 @@
+image: node:8-slim
+
+cache:
+  paths:
+    - node_modules/
+
+unittest:
+  stage: test
+  script:
+    - npm install
+    - npm test
